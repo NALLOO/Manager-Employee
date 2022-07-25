@@ -43,7 +43,7 @@
                 <div>
 
                     <div class="input">
-                        <label for="">Birth date</label>
+                        <label for="">Birth date r</label>
                         <input  v-model="employee.birth_date" type="date">
                         
                     </div>
