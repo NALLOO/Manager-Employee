@@ -1,26 +1,59 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="app">
+    <div class="container">
+      <Navigation />
+      <router-view />
+    </div>
+
+  </div>
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+// import PopUpForm from './components/PopUpForm.vue'
+// import Pagination from './components/Pagination.vue'
+import Navigation from './components/Navigation.vue'
+
+
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {}},
+  created(){
+    // if(!window.localStorage.getItem('access_token')) this.$router.push('/login')
+  },
+  
+      
+
+  
+  computed: {
   }
-}
+  ,
+  methods: {
+  },
+  components: {
+    Navigation
+  //   PopUpForm,
+  //   Pagination,
+  // 
+  }
+
+
+    }
+
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.container {
+  width: 100%;
+  min-height: 931px;
+  
 }
+body{
+  margin: 0;
+}
+
+
 </style>
