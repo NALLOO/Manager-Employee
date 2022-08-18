@@ -5,7 +5,7 @@
 
             <h2 class="title-form" v-if="isAddMode">Add Employee</h2>
             <h2 class="title-form" v-if="isEditMode">Edit Employee</h2>
-            <div class="popup-form">
+            <!-- <div class="popup-form">
                 <div>
                     <div class="input">
                         <label for="first-name">First name</label>
@@ -90,7 +90,64 @@
                     <button class="exit-form" @click="handleClickExit">Back</button>
                     <button type="submit" class="submit-form" @click.prevent="handleSubmit">submit</button>
                 </div>
-            </div>
+            </div> -->
+            <el-form :model="employee" ref="employee" class="popup-form">
+                <el-form-item label="First name" prop="first_name">
+                    <el-input v-model="employee.first_name"></el-input>
+                </el-form-item>
+                <el-form-item label="Last name" prop="last_name">
+                    <el-input v-model="employee.last_name"></el-input>
+                </el-form-item>
+               
+                <el-form-item label="Gender" prop="gender">
+                    <el-radio-group v-model="employee.gender" >
+                    <el-radio label="Male" value="M"></el-radio>
+                    <el-radio label="Female" value="F"></el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="Hire date" prop="hire_date">
+                    <el-date-picker v-model="employee.hire_date" type="date" placeholder="Hire Date"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="Birth date" prop="birth_date">
+                    <el-input v-model="employee.birth_date" type="date" placeholder="Birth Date"></el-input>
+                   
+                </el-form-item>
+                <el-form-item label="Title" prop="title_id">
+                    <el-select v-model="employee.title_id">
+                    <el-option label="Manager" value="1"></el-option>
+                    <el-option label="Developer" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Department" prop="department_id">
+                    <el-select v-model="employee.department_id">
+                    <el-option label="Division 1" value="1"></el-option>
+                    <el-option label="Division 2" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Salary" prop="salary">
+                    <el-input v-model="employee.salary" min="0" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="Avatar">
+                    <el-upload action="#" 
+                    list-type="picture-card"
+                    :class="{'limited':limited }"
+                    :show-file-list="true"
+                    :thumbnail-mode="true"
+                    :auto-upload="false"
+                    :on-remove="removeFile"
+                    :on-change="handleAvatarChange"
+                    
+
+                    >
+                    
+                    
+                    </el-upload>
+                </el-form-item>
+                <el-form-item>
+                    <el-button class="exit-form" @click="handleClickExit">Back</el-button>
+                    <el-button @click="handleSubmit" type="primary" style="margin-left: 100px;"> Submit</el-button>
+                </el-form-item>
+            </el-form>
         </div>
     </div>
 </template>
@@ -119,6 +176,7 @@ export default {
     },
     data() {
         return {
+            limited: false,
             err: {},
             url: this.employees.avatar? process.env.VUE_APP_IMG_URL+this.employees.avatar: null,
             // employee: this.emptyemployee,
@@ -140,14 +198,14 @@ export default {
                 data.append('emp_no', this.employee.emp_no)
                 data.append('first_name', this.employee.first_name) 
                 data.append('last_name', this.employee.last_name)
-                data.append('gender', this.employee.gender)
+                data.append('gender', this.employee.gender==='Male'? 'M' : 'F')
                 data.append('hire_date', this.employee.hire_date)
                 data.append('birth_date', this.employee.birth_date)
                 data.append('title_id', this.employee.title_id)
                 data.append('department_id', this.employee.department_id)
                 data.append('salary', this.employee.salary)
                 data.append('avatar', this.employee.avatar)
-                // console.log(data);
+                
                 employeeApi.update({data: data,id: this.employee.id})
                 this.$emit('exitform')
             }
@@ -159,14 +217,14 @@ export default {
                 data.append('emp_no', this.employee.emp_no)
                 data.append('first_name', this.employee.first_name)
                 data.append('last_name', this.employee.last_name)
-                data.append('gender', this.employee.gender)
+                data.append('gender', this.employee.gender==='Male'? 'M' : 'F')
                 data.append('hire_date', this.employee.hire_date)
                 data.append('birth_date', this.employee.birth_date)
                 data.append('title_id', this.employee.title_id)
                 data.append('department_id', this.employee.department_id)
                 data.append('salary', this.employee.salary)
                 data.append('avatar', this.employee.avatar)
-                // console.log(index);
+                
                 await employeeApi.add(data)
                 this.$emit('exitform')
                 location.reload()
@@ -174,10 +232,12 @@ export default {
             }
 
         },
-        setAvatar(e){
-            this.url = URL.createObjectURL(e.target.files[0])
+        setAvatar(res, file){
+            console.log(file,'file');
+            this.url = URL.createObjectURL(file.raw)
             // console.log(this.url);
-            this.employee.avatar = e.target.files[0]
+            this.employee.avatar = file
+            console.log(this.employee.avatar);
 
             // console.log(e);
         },
@@ -185,7 +245,36 @@ export default {
             this.url = null;
             this.employee.avatar = null;
 
+        },
+        removeFile(file,fileList){
+            if (fileList.length >=1) this.limited = true; else this.limited= false;
+            return;
         }
+    ,
+        handleAvatarChange(file,fileList) {
+        const isJPG = file.raw.type === 'image/jpeg';
+        const isLt2M = file.raw.size / 1024 / 1024 < 2;
+        
+        if (fileList.length >=1) this.limited = true; else this.limited= false
+
+        if (!isJPG) {
+          this.$message.error('Avatar picture must be JPG format!'); 
+          fileList.pop()
+        }
+        if (!isLt2M) {
+          this.$message.error('Avatar picture size can not exceed 2MB!');
+            fileList.pop()
+
+        }
+
+        if(isJPG && isLt2M) {
+            this.url = URL.createObjectURL(file.raw)
+            this.employee.avatar = file.raw
+            console.log(this.employee.avatar);
+        }
+        
+        return isJPG && isLt2M;
+      }
 
         ,
         validate(data) {
@@ -240,7 +329,7 @@ export default {
     justify-content: space-between;
     gap: 20px;
 }
-.popup-form input{
+/* .popup-form input{
     width: 300px;
 }
 .popup-form label{
@@ -256,7 +345,7 @@ export default {
 }
 .popup-form select option{
     font-size: 17px;
-}
+} */
 
 
 .input {
@@ -317,6 +406,21 @@ export default {
     padding: 1px;
     border-radius: 5px;
     border: 1px solid gray;
+}
+
+
+.el-upload {
+    width: 146px;
+    height: 146px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+.limited .el-upload{
+    visibility: hidden;
 }
 
 </style>

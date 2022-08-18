@@ -1,88 +1,106 @@
 <template>
     <div class="pagination-row">
         <div>
-        <button :class="{isActive: (this.$store.state.page>1)}" class="pagination-button" @click="handlePrev">Prev</button>
+        <button :class="{isActive: (this.pages>1)}" class="pagination-button" @click="handlePrev">Prev</button>
         <span v-for="(item, index) in new Array(this.$store.state.maxpage)" :key="index">
 
             <button 
             class="change-button" 
-            :class="{ ispage: (this.$store.state.page == index + 1) }" 
+            :class="{ ispage: (this.pages == index + 1) }" 
             
                 @click="handleChangePage(index+1)">{{
             index + 1
     }}</button>
         </span>
-        <button :class="{isActive: (this.$store.state.page<this.$store.state.maxpage)}" class="pagination-button" @click="handleNext">Next</button>
+        <button :class="{isActive: (this.pages<this.$store.state.maxpage)}" class="pagination-button" @click="handleNext">Next</button>
     </div>
     </div>
 </template>
 
 <script >
-import employeeApi from '@/api/employeeApi'
-
+// import employeeApi from '@/api/employeeApi'
+// import { useVModel } from '@/composables/useVModel';
 
 
 // console.log(this.pages);
 export default {
     name: 'pagination-component',
+    // emits:['update:page'],
     props: {
-        pages: Number,
-        onPage: {
-            type: Number,
-            default() { return 0 }
+        modelValue: Number,
+        // onPage: {
+        //     type: Number,
+        //     default() { return 0 }
+        // }
+    },
+    
+    // data(props){
+    //     return {
+    //         pageState: props.page
+    //         // useVModel(props, 'page')
+    //     }
+    // },
+    computed: {
+        pages:{
+            get()  { return this.modelValue},
+            set(value) {
+                this.$emit('update:modelValue', value) 
+            }
         }
-    },
-    mounted() {
-
-    },
-    data() {
-        return {
-            page: 1
-        }
-    },
+    }
+    ,
     methods: {
         async handleChangePage(index) {
-            if(this.$store.state.page !== index) {
-                await this.$router.push({ name: 'employee', params: { page: index }})
-                await this.$store.dispatch('setPage', index);
-                const res = employeeApi.getAll(this.$route.params)
-                res.then((response) => {
+            console.log(index);
+            // this.pageState = index;
+            this.pages = index;
+        //    this.$emit('update:page', index) 
+            this.$router.push({ name: 'employee', params: { page: index }})
+            // if(this.$store.state.page !== index) {
+            //     await this.$router.push({ name: 'employee', params: { page: index }})
+            //     await this.$store.dispatch('setPage', index);
+            //     const res = employeeApi.getAll(this.$route.params)
+            //     res.then((response) => {
 
-                    this.$store.dispatch('setPage', +this.$route.params.page);
-                    this.$store.dispatch('setMaxPage', response.maxPage);
-                    this.$store.dispatch('setEmployees', response.data);
-                })
-                    .catch((error) => { console.log(error); })
-            }
+            //         this.$store.dispatch('setPage', +this.$route.params.page);
+            //         this.$store.dispatch('setMaxPage', response.maxPage);
+            //         this.$store.dispatch('setEmployees', response.data);
+            //     })
+            //         .catch((error) => { console.log(error); })
+            // }
 
         },
         async handlePrev() {
-            if (this.$store.state.page > 1){
-                await this.$router.push({ name: 'employee', params: { page: this.$store.state.page - 1 } })
-                await this.$store.dispatch('setPage', this.$store.state.page - 1);
-                const res = employeeApi.getAll(this.$route.params)
-                res.then((response) => {
+            if (this.pageState > 1){
+                this.pageState -=1;
+            //     await this.$router.push({ name: 'employee', params: { page: this.$store.state.page - 1 } })
+            //     await this.$store.dispatch('setPage', this.$store.state.page - 1);
+            //     const res = employeeApi.getAll(this.$route.params)
+            //     res.then((response) => {
 
-                    this.$store.dispatch('setPage', +this.$route.params.page);
-                    this.$store.dispatch('setMaxPage', response.maxPage);
-                    this.$store.dispatch('setEmployees', response.data);
-                })
-                    .catch((error) => { console.log(error); })
+            //         this.$store.dispatch('setPage', +this.$route.params.page);
+            //         this.$store.dispatch('setMaxPage', response.maxPage);
+            //         this.$store.dispatch('setEmployees', response.data);
+            //     })
+            //         .catch((error) => { console.log(error); })
             }
         },
 
         async handleNext() {
-            if (this.$store.state.page < this.$store.maxpage) {
-                await this.$router.push({ name: 'employee', params: { page: this.$store.state.page + 1 } })
-                await this.$store.dispatch('setPage', this.$store.state.page + 1);
-                const res = employeeApi.getAll(this.$route.params)
-                res.then((response) => {
+            
+            if (this.pageState < this.$store.state.maxpage) {
+                
+                this.pageState += 1;
+            //     await this.$router.push({ name: 'employee', params: { page: this.$store.state.page + 1 } })
+            //     await this.$store.dispatch('setPage', this.$store.state.page + 1);
+            //     const res = employeeApi.getAll(this.$route.params)
+            //     res.then((response) => {
 
-                    this.$store.dispatch('setPage', +this.$route.params.page);
-                    this.$store.dispatch('setMaxPage', response.maxPage);
-                    this.$store.dispatch('setEmployees', response.data);
-                })
-                    .catch((error) => { console.log(error); })
+            //         this.$store.dispatch('setPage', +this.$route.params.page);
+            //         this.$store.dispatch('setMaxPage', response.maxPage);
+            //         this.$store.dispatch('setEmployees', response.data);
+            //     })
+            //         .catch((error) => { console.log(error); })
             }
         }
     }

@@ -3,7 +3,9 @@ import axiosClient from "./axiosClient"
 const employeeApi ={
     getAll:(params)=>{
         const url = '/employee'
-        return axiosClient.get(url,{params:params})
+        return axiosClient.get(url
+            ,{params:params}
+            )
     },
     delete:(id)=>{
         const url =`/employee/${id}`
@@ -11,7 +13,7 @@ const employeeApi ={
     },
     add:(data)=>{
         const url = '/employee'
-        console.log('add');
+        
         return axiosClient.post(url,data)
     },
     update:({data,id})=>{

@@ -31,7 +31,7 @@
           </tr>
         </template>
       </table>
-      <Pagination/>
+      <Pagination v-model = "page"/>
     </div>
    
   </div>
@@ -54,10 +54,18 @@ export default {
         baseImgUrl: process.env.VUE_APP_IMG_URL,
         isAddMode: false,
         isEditMode: false,
+        page: 1,
+        
         employee:{}
       }
     },
-    
+    watch:{
+      page(newPage, oldPage){
+        if(newPage!==oldPage){
+          this.getEmployee(newPage);
+        }
+      }
+    },
     components:{
     Pagination,
     PopUpForm
@@ -70,6 +78,7 @@ export default {
         if ((+this.$route.params.page<1)||(+this.$route.params.page>=response.maxPage) ) {
           this.$store.dispatch('setPage', 1);
           this.$store.dispatch('setMaxPage',response.maxPage);
+          
           const res= employeeApi.getAll({page: 1})
           res.then((response)=>{
             this.$store.dispatch('setEmployees',response.data)
@@ -84,6 +93,14 @@ export default {
       .catch((error)=>{console.log(error);})
     },
     methods:{
+      getEmployee(page){
+         const res= employeeApi.getAll({page: page})
+          res.then((response)=>{
+            this.$store.dispatch('setEmployees',response.data)
+          })
+          .catch((err)=>{console.log(err);})
+      }
+      ,
       handleClickAdd(){
         this.isAddMode = true,
         this.employee ={}

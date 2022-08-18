@@ -3,11 +3,13 @@ import Register from "@/view/Register.vue";
 import Login from "@/view/Login.vue";
 import Home from "@/view/Home.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import ErrorPage from "@/view/ErrorPage.vue";
 const routes =[
     {path:'/', component: Home, meta: {requiresAuth: true}},
     {path:'/login', component: Login},
     {path:'/register', component: Register},
-    {path:'/employee/:page',name:'employee', component: EmployeeList, meta: { requiresAuth : true , userId :  true} }
+    {path:'/employee/page=:page',name:'employee', component: EmployeeList, meta: { requiresAuth : true , userId :  true} },
+    {path:'/:catchAll(.*)', name: 'ErrorPage', component: ErrorPage}
 ]
 const router= createRouter({
     history:createWebHistory(),

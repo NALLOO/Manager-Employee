@@ -7,28 +7,28 @@
 
             <input type="text" name="username" placeholder="User name" v-model="registerValues.username">
           </div>
-          <p class="error" v-if="err.username">{{err.username}}</p>
+          <p class="error" v-if="v$.registerValues.username.$error">{{v$.registerValues.username.$errors[0].$message}}</p>
         </div>
         <div>
           <div>
 
             <input type="email" name="email" placeholder="Email" v-model="registerValues.email"> 
           </div>
-          <p class="error" v-if="err.email">{{err.email}}</p>
+          <p class="error" v-if="v$.registerValues.email.$error">{{v$.registerValues.email.$errors[0].$message}}</p>
         </div>
         <div>
           <div>
 
             <input type="password" name="password" placeholder="Enter the password" v-model="registerValues.password">
           </div>
-          <p class="error" v-if="err.password">{{err.password}}</p>
+          <p class="error" v-if="v$.registerValues.password.$error">{{v$.registerValues.password.$errors[0].$message}}</p>
         </div>
         <div>
           <div>
 
-            <input type="password" name="re-password" placeholder="Re-enter the password" v-model="registerValues.repassword">
+            <input type="password" name="re-password" placeholder="Confirm password" v-model="registerValues.repassword">
           </div>
-          <p class="error" v-if="err.repassword">{{err.repassword}}</p>
+          <p class="error" v-if="v$.registerValues.repassword.$error">{{v$.registerValues.repassword.$errors[0].$message}}</p>
           <p class="error" v-if="err.submit">{{err.submit}}</p>
         </div>
         <div class="register-button">
@@ -40,11 +40,20 @@
 </template>
 
 <script>
-import authApi from '@/api/authApi'
+// import authApi from '@/api/authApi'
 import '../style/error.css'
+import useVuelidate from '@vuelidate/core'
+import {required, email, minLength, sameAs, helpers} from '@vuelidate/validators'
+
 
 export default {
     name: 'register-view',
+    setup() {
+      return {
+        v$: useVuelidate()
+      }
+    }
+    ,
     data(){
       return{
         err:{},
@@ -56,25 +65,43 @@ export default {
         }
       }
     },
+    validations() {
+      return {
+        registerValues:{
+          username:{required},
+          email:{required, email},
+          password:{required, minLength: helpers.withMessage('This field should be at least 6 long.',minLength(6)) },
+          repassword:{ required, sameAs: helpers.withMessage('This field must be same as password field.', sameAs(this.registerValues.password))}
+        }
+      }
+    }
+    ,
+
     methods:{
       handleRegister(){
-        this.err = this.validateRegister(this.registerValues)
-         if (Object.keys(this.err).length === 0 && this.err.constructor === Object){
-            const data = {
-              username: this.registerValues.username,
-              email:this.registerValues.email,
-              password:this.registerValues.password,
-            }
-            const res = authApi.register(data)
-            res.then((response)=>{
-              console.log(response);
-              this.$router.push('/login')
-            })
-            .catch((error)=>{
-              console.log(error);
-              this.err.submit = error.response.data.message
-            })
-         }
+        this.v$.$validate()
+        if (this.v$.$error){
+          console.log(this.v$.registerValues.password.$errors);
+        } else {
+          alert('success')
+        }
+        // this.err = this.validateRegister(this.registerValues)
+        //  if (Object.keys(this.err).length === 0 && this.err.constructor === Object){
+        //     const data = {
+        //       username: this.registerValues.username,
+        //       email:this.registerValues.email,
+        //       password:this.registerValues.password,
+        //     }
+        //     const res = authApi.register(data)
+        //     res.then((response)=>{
+        //       console.log(response);
+        //       this.$router.push('/login')
+        //     })
+        //     .catch((error)=>{
+        //       console.log(error);
+        //       this.err.submit = error.response.data.message
+        //     })
+        //  }
       },
       validateRegister(values){
         const err ={}

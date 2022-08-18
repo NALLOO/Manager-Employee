@@ -22,6 +22,7 @@ export default {
   data() {
     return {}},
   created(){
+    console.log('created');
     // if(!window.localStorage.getItem('access_token')) this.$router.push('/login')
   },
   
